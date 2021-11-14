@@ -1,98 +1,103 @@
-import { model, Schema, Document, Model } from "mongoose";
-import { User, UserModel } from "@interfaces/users.interface";
-import { AccountTypes } from "@/interfaces/accountTypes.interface";
+import { model, Schema } from "mongoose";
+import { award, businessItem, experience, seeking, settings, talent, talentItem, user, userModel } from "@/interfaces/user.interface";
+import { AccountTypes } from "@/interfaces/AccountTypes.interface";
 
-const experienceOrAwards = new Schema<User, UserModel>({
-	title: String,
-	location: String,
-	date: Date
+const Award = new Schema<award>({
+	title: {type: String, required: true},
+	location: {type: String, required: true},
+	date: {type: Date, required: true},
 });
 
-const talentExperience = new Schema<User, UserModel>({
-	employer: String,
-	title: String,
-	dateOfEmployment: Date
+const Experience = new Schema<experience>({
+	employer: {type: String, required: true},
+	title: {type: String, required: true},
+	dateOfEmployment: {type: Date, required: true}
 });
 
-const seeking = new Schema<User, UserModel>({
-	typeofBusiness: String,
-	businessTitle: String,
-	description: String,
-	categories: [String],
-	experienceOrAwards: [experienceOrAwards]
+const BusinessItem = new Schema<businessItem>({
+	typeOfBusiness: {type: String, required: true},
+	title: { type: String, required: true },
+	description: {type: String, required: true},
+	category: {type: Schema.Types.ObjectId, ref:"METADATA"},
 });
 
-const talent = new Schema<User, UserModel>({
-	title: String,
-	description: String,
-	categories: [String],
-});
-
-const review = new Schema<User, UserModel>({
-	hiredBy: String,
-	jobTitle: String,
-	comments: String,
-	rating: Number
-});
-
-const showcase = new Schema<User, UserModel>({
-	talents: [talent],
+const Seeking = new Schema<seeking>({
+	businessDetails: [BusinessItem],
 	businessName: String,
-	bio: String,
-	fullname: String,
-	talentExperience: [talentExperience],
-	reviews: [review]
+	profileBio: String,
+	awards: [Award],
+	talentInterests: [{type: Schema.Types.ObjectId, ref:"METADATA"}]
 });
 
-const schema = new Schema<User, UserModel>({
+const TalentItem = new Schema<talentItem>({
+	title: {type: String, required: true},
+	description: {type: String, required: true},
+	category: {type: Schema.Types.ObjectId, ref:"METADATA"},
+});
+
+const Talent = new Schema<talent>({
+	talents: [TalentItem],
+	fullname: {type: String, required: true},
+	profileBio : {type: String, required: true},	
+	experience: [Experience]
+});
+
+const Settings = new Schema<settings>({
+	notificationSettings: {
+		postInteractions: { type: Boolean, default: false },
+		friendRequests: { type: Boolean, default: true },
+		messages: { type: Boolean, default: true },
+	},
+	securitySettings: {
+		age: { type: Boolean, default: true },
+		location: { type: Boolean, default: true },
+		reviews: { type: Boolean, default: true },
+	},
+	blocked:[{type: Schema.Types.ObjectId, ref:"USER"}],
+});
+
+const schema = new Schema<user, userModel>({
 	photo: { type: String, required: false },
 	background: { type: String, required: false },
 	name: {
-		fullName: { type: String, required: true },
+		fullName: { type: String, required: false, index: true },
 		displayOnProfile: { type: Boolean, default: true }
 	},
-	username: { type: String, required: true },
+	username: { type: String, required: true, unique: true },
 	email: {
 		type: String,
 		required: true,
 		unique: true,
 	},
 	password: { type: String, required: true },
-	accountType: { type: String, enum: Object.values(AccountTypes), required: true },
+	accountType: { type: String, enum: Object.values(AccountTypes), required: false, index: true },
 	location: {
-		city: {type: String, required: true},
-		country: {type: String, required: true},
+		city: {type: String, required: false},
+		country: {type: String, required: false},
 		coordinates: { type: [Number], index: '2dsphere', required: false },
 		displayOnProfile: { type: Boolean, default: true }
 	},
-	seekingTalent: seeking,
-	showcaseTalent: showcase,
-	tags: [String],
-	phone: { type: String, required: false },
 	dateOfBirth: {
-		date: { type: Date, required: true },
+		date: { type: Date, required: false },
 		displayOnProfile: { type: Boolean, default: true }
 	},
+	showcaseTalent: {type: Talent, required: false},
+	seekingTalent: {type: Seeking, required: false},
+	tags: [{ type: Schema.Types.ObjectId, ref:"METADATA"}],
 	friends: [{ type: Schema.Types.ObjectId, ref: "USER" }],
 	subscribtions: [{ type: Schema.Types.ObjectId, ref: "USER" }],
-	notifications: {
-		postInteractions: { type: Boolean, default: false },
-		friendRequests: { type: Boolean, default: true },
-		messages: { type: Boolean, default: true },
-	},
-	security: {
-		age: { type: Boolean, default: true },
-		location: { type: Boolean, default: true },
-		reviews: { type: Boolean, default: true },
-	},
-	blocked:[{type: Schema.Types.ObjectId, ref:"USER"}],
+	reviews: [{type:Schema.Types.ObjectId, ref:"REVIEW"}],
+	phone: { type: String, required: false, index: true },
+	settings: {type: Settings, required: false},
 	socialMediaHandles: {
 		type: Map,
 		of: String,
-		default: {},
-		required: false
+		required: false,
+		index: true
 	}
 }, { timestamps: true });
+
+schema.index({ username: 1, email: -1 });
 
 schema.pre(
 	"validate", { document: true }, function (): void {
@@ -112,14 +117,14 @@ schema.statics.resetPassword = async function (code: string, password: string) {
 
 };
 
-const userModel = model<User, UserModel>("USER", schema);
+const userModel = model<user, userModel>("USER", schema);
 
 userModel.ensureIndexes(function (err) {
+	console.log("indexing user");
 	if (err) console.log(err);
 });
 
 userModel.on("index", function (err) {
-	console.log("indexing user");
 	if (err) console.error(err);
 });
 
