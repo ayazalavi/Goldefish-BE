@@ -2,10 +2,10 @@
     "env": "development",
     "dbConfig": {
         "host": "localhost",
-        "database": "mongoose",
+        "database": "goldfish_dev",
         "port": 27017
     },
-    "secretKey": "secretKey",
+    "secretKey": "00 22 44 66 88 99 77 55 33 11",
     "log": {
         "format": "dev",
         "dir": "../logs"
