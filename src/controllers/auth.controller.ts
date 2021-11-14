@@ -1,17 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
-import { CreateUserDto } from '@dtos/users.dto';
+import { SignUpDTO } from '@/dtos/signup.dto';
 import { RequestWithUser } from '@interfaces/auth.interface';
-import { User } from '@interfaces/users.interface';
+import { user } from '@/interfaces/user.interface';
 import AuthService from '@services/auth.service';
+import { LoginDTO } from '@/dtos/login.dto';
+import { ForgotDTO } from '@/dtos/forgot.dto';
+import { SocialDTO } from '@/dtos/social.dto';
 
 class AuthController {
   public authService = new AuthService();
 
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userData: CreateUserDto = req.body;
-      const signUpUserData: User = await this.authService.signup(userData);
-
+      const userData: SignUpDTO = req.body;
+      const signUpUserData: user = await this.authService.signup(userData);
       res.status(201).json({ data: signUpUserData, message: 'signup' });
     } catch (error) {
       next(error);
@@ -20,11 +22,9 @@ class AuthController {
 
   public logIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userData: CreateUserDto = req.body;
-      const { cookie, findUser } = await this.authService.login(userData);
-
-      res.setHeader('Set-Cookie', [cookie]);
-      res.status(200).json({ data: findUser, message: 'login' });
+      const userData: LoginDTO = req.body;
+      const { token, loggedInUser } = await this.authService.login(userData);
+      res.status(200).json({ data: loggedInUser, message: 'login', token });
     } catch (error) {
       next(error);
     }
@@ -32,35 +32,29 @@ class AuthController {
 
   public logOut = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-      const userData: User = req.user;
-      const logOutUserData: User = await this.authService.logout(userData);
-
-      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
+      const userData: user = req.user;
+      const logOutUserData: user = await this.authService.logout(userData);
       res.status(200).json({ data: logOutUserData, message: 'logout' });
     } catch (error) {
       next(error);
     }
   };
 
-  public forgot = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  public forgot = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userData: User = req.user;
-      const logOutUserData: User = await this.authService.logout(userData);
-
-      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
-      res.status(200).json({ data: logOutUserData, message: 'logout' });
+      const userData: ForgotDTO = req.body;
+      const email = await this.authService.forgot(userData);
+      res.status(200).json({ data: email, message: 'forgot' });
     } catch (error) {
       next(error);
     }
   };
 
-  public social = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  public social = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userData: User = req.user;
-      const logOutUserData: User = await this.authService.logout(userData);
-
-      res.setHeader('Set-Cookie', ['Authorization=; Max-age=0']);
-      res.status(200).json({ data: logOutUserData, message: 'logout' });
+      const userData: SocialDTO = req.body;
+      const { token, socialUser } = await this.authService.social(userData);
+      res.status(200).json({ data: socialUser, message: 'social' });
     } catch (error) {
       next(error);
     }

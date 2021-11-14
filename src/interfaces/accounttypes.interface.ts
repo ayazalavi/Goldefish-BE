@@ -1,0 +1,5 @@
+export enum AccountTypes {
+    SHOWCASE_TALENT="SHOWCASE_TALENT",
+    SEEKING_TALENT="SEEKING_TALENT",
+    FOR_FUN="FOR_FUN"
+  }
