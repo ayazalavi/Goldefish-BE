@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import App from '@/app';
-import { CreateUserDto } from '@dtos/users.dto';
+import { SignUpDTO } from '@/dtos/signup.dto';
 import UsersRoute from '@/routes/profile.route';
 
 afterAll(async () => {
@@ -60,9 +60,11 @@ describe('Testing Users', () => {
 
   describe('[POST] /users', () => {
     it('response Create User', async () => {
-      const userData: CreateUserDto = {
+      const userData: SignUpDTO = {
         email: 'test@email.com',
-        password: 'q1w2e3r4',
+        password: 'q1w2e3r4!',
+        phone: '123456789',
+        username:'ayaz_123'
       };
 
       const usersRoute = new UsersRoute();
@@ -84,9 +86,11 @@ describe('Testing Users', () => {
   describe('[PUT] /users/:id', () => {
     it('response Update User', async () => {
       const userId = '60706478aad6c9ad19a31c84';
-      const userData: CreateUserDto = {
+      const userData: SignUpDTO = {
         email: 'test@email.com',
-        password: 'q1w2e3r4',
+        password: 'q1w2e3r4!',
+        phone: '123456789',
+        username:'ayaz_123'
       };
 
       const usersRoute = new UsersRoute();
