@@ -5,14 +5,14 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "npm run build && cross-env NODE_ENV=production node dist/server.js",
+    "start": "npm run build && cross-env NODE_ENV=production node",
     "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc && npx tsc-alias",
     "test": "jest --forceExit --detectOpenHandles",
     "lint": "eslint --ignore-path .gitignore --ext .ts src/",
     "lint:fix": "npm run lint -- --fix"
   },
-  "dependencies": {
+  "dependencies": {  
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
