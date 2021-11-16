@@ -14,6 +14,7 @@ export class SignUpDTO {
     message: 'Password should be less than 20 characters in length',
   })
   @IsString()
+  @IsAlphanumeric()
   public username: string;
 
   @MinLength(6, {

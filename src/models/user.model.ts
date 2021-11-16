@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { award, businessItem, experience, seeking, settings, talent, talentItem, user, userModel } from "@/interfaces/user.interface";
-import { AccountTypes } from "@/interfaces/AccountTypes.interface";
+import { AccountTypes } from "@/interfaces/accounttypes.interface";
 
 const Award = new Schema<award>({
 	title: {type: String, required: true},
@@ -69,7 +69,9 @@ const schema = new Schema<user, userModel>({
 		required: true,
 		unique: true,
 	},
-	password: { type: String, required: true },
+	password: { type: String, required: false },
+	isEmailVerified: { type: Boolean, default: false},
+	verificationCode: { type: String, required: true},
 	accountType: { type: String, enum: Object.values(AccountTypes), required: false, index: true },
 	location: {
 		city: {type: String, required: false},
@@ -109,17 +111,9 @@ schema.pre("save", function (): void {
 	console.log("pre save");
 });
 
-schema.statics.authenticateUser = async function (email: string, password: string) {
-	
-};
-
-schema.statics.resetPassword = async function (code: string, password: string) {	
-
-};
-
 const userModel = model<user, userModel>("USER", schema);
 
-userModel.ensureIndexes(function (err) {
+userModel.createIndexes(function (err) {
 	console.log("indexing user");
 	if (err) console.log(err);
 });

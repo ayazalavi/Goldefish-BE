@@ -6,6 +6,7 @@ import AuthService from '@services/auth.service';
 import { LoginDTO } from '@/dtos/login.dto';
 import { ForgotDTO } from '@/dtos/forgot.dto';
 import { SocialDTO } from '@/dtos/social.dto';
+import { VerifyDTO } from '@/dtos/verify.dto';
 
 class AuthController {
   public authService = new AuthService();
@@ -15,6 +16,16 @@ class AuthController {
       const userData: SignUpDTO = req.body;
       const signUpUserData: user = await this.authService.signup(userData);
       res.status(201).json({ data: signUpUserData, message: 'signup' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public verify = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userData: VerifyDTO = req.params;
+      const verified = await this.authService.verify(userData);
+      res.status(201).json({ data: verified, message: 'verify' });
     } catch (error) {
       next(error);
     }

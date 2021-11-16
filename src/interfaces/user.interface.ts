@@ -1,5 +1,5 @@
 import { Model, ObjectId } from "mongoose";
-import { AccountTypes } from "./AccountTypes.interface";
+import { AccountTypes } from "./accounttypes.interface";
 import { review } from "./review.interface";
 
 export interface name {
@@ -97,10 +97,12 @@ export interface user {
   phone: string;
   settings: settings;
   socialMediaHandles: Map<string, string>;
+  isEmailVerified: boolean;
+  verificationCode: string;
 }
 
 
 export interface userModel extends Model<user> {
-	authenticateUser: (email: string, password: string) => user;
-	resetPassword: (code: string, password: string) => user;
+	// authenticateUser: (email: string, password: string) => user;
+	// resetPassword: (code: string, password: string) => user;
 }

@@ -7,6 +7,7 @@ import validationMiddleware from '@middlewares/validation.middleware';
 import { ForgotDTO } from '@/dtos/forgot.dto';
 import { LoginDTO } from '@/dtos/login.dto';
 import { SocialDTO } from '@/dtos/social.dto';
+import { VerifyDTO } from '@/dtos/verify.dto';
 
 class AuthRoute implements Routes {
   public path = '/auth/';
@@ -23,6 +24,7 @@ class AuthRoute implements Routes {
     this.router.post(`${this.path}forgot`, validationMiddleware(ForgotDTO, 'body'), this.authController.forgot);
     this.router.post(`${this.path}social`, validationMiddleware(SocialDTO, 'body'), this.authController.social);
     this.router.get(`${this.path}logout`, authMiddleware, this.authController.logOut);
+    this.router.get(`${this.path}verify/code:token`, validationMiddleware(VerifyDTO, 'params'), this.authController.verify);
   }
 }
 

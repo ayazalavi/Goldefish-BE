@@ -10,16 +10,20 @@ import { isEmpty } from '@utils/util';
 import { LoginDTO } from '@/dtos/login.dto';
 import { ForgotDTO } from '@/dtos/forgot.dto';
 import { SocialDTO } from '@/dtos/social.dto';
+import { VerifyDTO } from '@/dtos/verify.dto';
 
 class AuthService {
   public users = userModel;
 
   public async signup(userData: SignUpDTO): Promise<user> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-    const findUser: user = await this.users.findOne({ $or: [{'email': userData.email}, {'username': userData.email}] });
+    const findUser: user = await this.users.findOne({ $or: [{'email': userData.email}, {'username': userData.username}] });
     if (findUser) throw new HttpException(409, `Username or email already exists`);
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createUserData: user = await this.users.create({ ...userData, password: hashedPassword });
+    const verificationCode = await bcrypt.hash(userData.email+userData.username, 10);
+    const createUserData: user = await this.users.create({ ...userData, password: hashedPassword,
+    verificationCode });
+    //send email with verification code
     return createUserData;
   }
 
@@ -29,6 +33,7 @@ class AuthService {
     if (!findUser) throw new HttpException(409, `Username/Email not found`);
     const isPasswordMatching: boolean = await bcrypt.compare(userData.password, findUser.password);
     if (!isPasswordMatching) throw new HttpException(409, "You're password is incorrect");
+   // if (!findUser.isEmailVerified) throw new HttpException(409, `Email not verified`);    
     const tokenData = this.createToken(findUser);
     return { token: tokenData, loggedInUser: findUser };
   }
@@ -49,13 +54,35 @@ class AuthService {
     return true;
   }
 
+  public async verify(userData: VerifyDTO): Promise<boolean> {
+    console.log(userData)
+    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
+    const findUser: user = await this.users.findOneAndUpdate({ 'verificationCode': userData.token}, 
+    {"isEmailVerified" : true}).exec();
+    if (!findUser) throw new HttpException(409, `Incorrect request data sent`);
+    else if (findUser.isEmailVerified) throw new HttpException(409, `Email already verified`);
+    return true;
+  }
+
   public async social(userData: SocialDTO): Promise<{ token: string; socialUser: user }> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-    const key = `{ 'socialMediaHandles.${userData.type}': '${userData.id}'`;
-    const findUser: user = await this.users.findOne(JSON.parse(key));
-    //if (!findUser) throw new HttpException(409, `Username/Email not found`);
-    //const isPasswordMatching: boolean = await bcrypt.compare(userData.password, findUser.password);
-    //if (!isPasswordMatching) throw new HttpException(409, "You're password is incorrect");
+    var socialMediaMap = new Map();
+    socialMediaMap.set(userData.type, userData.id);
+    if (userData.email !== '') {
+      var findUser: user = await this.users.findOne({ email: userData.email });
+      if (findUser) {
+        findUser.socialMediaHandles = socialMediaMap;
+      }
+    }
+    else {
+      const key = `{ 'socialMediaHandles.${userData.type}': '${userData.id}'`;
+      findUser = await this.users.findOne(JSON.parse(key));
+    }
+    if (!findUser) {
+      findUser = await this.users.create({ email: userData.email, username: userData.username,
+      phone: userData.phone, socialMediaHandles: socialMediaMap});
+    }
+    //post to social media
     const tokenData = this.createToken(findUser);
     return { token: tokenData, socialUser: findUser };
   }
