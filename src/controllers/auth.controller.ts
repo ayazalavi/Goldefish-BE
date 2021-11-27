@@ -23,7 +23,7 @@ class AuthController {
 
   public verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userData: VerifyDTO = req.params;
+      const userData: VerifyDTO = req.params as unknown as VerifyDTO;
       const verified = await this.authService.verify(userData);
       res.status(201).json({ data: verified, message: 'verify' });
     } catch (error) {
