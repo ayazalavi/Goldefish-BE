@@ -11,29 +11,34 @@ import { LoginDTO } from '@/dtos/login.dto';
 import { ForgotDTO } from '@/dtos/forgot.dto';
 import { SocialDTO } from '@/dtos/social.dto';
 import { VerifyDTO } from '@/dtos/verify.dto';
+import EmailService from './email.service';
 
 class AuthService {
   public users = userModel;
 
   public async signup(userData: SignUpDTO): Promise<user> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-    const findUser: user = await this.users.findOne({ $or: [{'email': userData.email}, {'username': userData.username}] });
+    const findUser: user = await this.users.findOne({ $or: [{ 'email': userData.email }, { 'username': userData.username }] });
     if (findUser) throw new HttpException(409, `Username or email already exists`);
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const verificationCode = await bcrypt.hash(userData.email+userData.username, 10);
     const createUserData: user = await this.users.create({ ...userData, password: hashedPassword,
-    verificationCode });
+      verificationCode
+    });
+   // EmailService.sendForgotEmail
     //send email with verification code
     return createUserData;
   }
 
   public async login(userData: LoginDTO): Promise<{ token: string; loggedInUser: user }> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-    const findUser: user = await this.users.findOne({ $or: [{'email': userData.usernameEmail}, {'username': userData.usernameEmail}] });
-    if (!findUser) throw new HttpException(409, `Username/Email not found`);
+    const findUser: user = await this.users.findOne(
+      { $or: [{ 'email': userData.usernameEmail }, { 'username': userData.usernameEmail }] }, "-verificationCode").exec();
+    if (!findUser) throw new HttpException(409, `Username/Email not found`);    
     const isPasswordMatching: boolean = await bcrypt.compare(userData.password, findUser.password);
     if (!isPasswordMatching) throw new HttpException(409, "You're password is incorrect");
-   // if (!findUser.isEmailVerified) throw new HttpException(409, `Email not verified`);    
+  //  if (!findUser.isEmailVerified) throw new HttpException(409, `Email not verified`);  
+    findUser["password"] = "";
     const tokenData = this.createToken(findUser);
     return { token: tokenData, loggedInUser: findUser };
   }
@@ -47,10 +52,13 @@ class AuthService {
 
   public async forgot(userData: ForgotDTO): Promise<boolean> {
     if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
-    const findUser: user = await this.users.findOne({ 'email': userData.email});
+    const findUser: user = await this.users.findOne({ $or: [{ 'email': userData.email }, { 'username': userData.email }] }).exec();
     if (!findUser) throw new HttpException(409, `${userData.email} is not signed up`);
-    // send email
-    //const tokenData = this.sendEmail(findUser);
+    const password = (userData.email + (new Date()).getTime()).replace(/[^A-z0-9]/g, '').toLowerCase();
+    const hashedPassword = await bcrypt.hash(password, 10);    
+    findUser.password = hashedPassword;
+    findUser.save();
+    await EmailService.sendForgotEmail(findUser, password);
     return true;
   }
 
