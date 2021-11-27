@@ -5,7 +5,7 @@ import userService from '@/services/profile.service';
 import { Sign } from 'crypto';
 import ProfileService from '@/services/profile.service';
 import { RequestWithUser } from '@/interfaces/auth.interface';
-import { isMongoId } from 'class-validator';
+import { isEnum, isMongoId } from 'class-validator';
 
 class ProfileController {
   public profileService = new ProfileService();
@@ -23,13 +23,11 @@ class ProfileController {
     }
   };
 
-  public updateProfile = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId: string = req.params.id;
-      const userData: SignUpDTO = req.body;
-      const updateUserData: user = await this.profileService.updateUser(userId, userData);
-
-      res.status(200).json({ data: updateUserData, message: 'updated' });
+  public updateProfile = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {   
+      //const updateUserData: user = await this.profileService.updateUser(userId, userData);
+      console.log(req.body)
+      res.status(200).json({ data: [], message: 'updated' });
     } catch (error) {
       next(error);
     }
