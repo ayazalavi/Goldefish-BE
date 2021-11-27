@@ -1,5 +1,5 @@
 import { Document, Model, ObjectId } from "mongoose";
-import { AccountTypes } from "./accounttypes.interface";
+import { AccountTypes } from "../enum/accounttypes.enum";
 import { review } from "./review.interface";
 
 export interface name {

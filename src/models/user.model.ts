@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 import { award, businessItem, experience, seeking, settings, talent, talentItem, user, userModel } from "@/interfaces/user.interface";
-import { AccountTypes } from "@/interfaces/accounttypes.interface";
+import { AccountTypes } from "@/enum/accounttypes.enum";
 
 const Award = new Schema<award>({
 	title: {type: String, required: true},
@@ -53,7 +53,12 @@ const Settings = new Schema<settings>({
 		location: { type: Boolean, default: true },
 		reviews: { type: Boolean, default: true },
 	},
-	blocked:[{type: Schema.Types.ObjectId, ref:"USER"}],
+	blocked: {
+		type: [Schema.Types.ObjectId],
+		ref: "USER",
+		default: [],
+		required: true
+	},
 });
 
 const schema = new Schema<user, userModel>({
@@ -76,7 +81,6 @@ const schema = new Schema<user, userModel>({
 	location: {
 		city: {type: String, required: false},
 		country: {type: String, required: false},
-		coordinates: { type: [Number], index: '2dsphere', required: false },
 		displayOnProfile: { type: Boolean, default: true }
 	},
 	dateOfBirth: {
