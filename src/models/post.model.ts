@@ -1,6 +1,4 @@
 import { Discussion, DiscussionModel } from "@/interfaces/comment.interface";
-import { PickModel, Pick } from "@/interfaces/goal.interface";
-import { ReadTalk, ReadTalkModel } from "@/interfaces/readtalk.interface";
 import { model, Schema } from "mongoose";
 
 

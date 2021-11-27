@@ -1,7 +1,6 @@
-import { ReadTalk, ReadTalkModel } from "@/interfaces/readtalk.interface";
 import { model, Schema } from "mongoose";
 
-const schema = new Schema<ReadTalk, ReadTalkModel>({
+const schema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: "USER" },
     title: { type: String, required: true, index: true },
     photoURI: { type: String, required: true },
@@ -13,7 +12,7 @@ const schema = new Schema<ReadTalk, ReadTalkModel>({
     filters: [{ type: Map, of: String }],
 }, { timestamps: true });
 
-const mymodel = model<ReadTalk, ReadTalkModel>("READTALK", schema);
+const mymodel = model("READTALK", schema);
 
 mymodel.ensureIndexes(function (err) {
 	if (err) console.log(err);

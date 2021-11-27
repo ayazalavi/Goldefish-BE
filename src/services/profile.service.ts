@@ -5,7 +5,7 @@ import { user } from '@/interfaces/user.interface';
 import userModel from '@/models/user.model';
 import { isEmpty } from '@utils/util';
 
-class UserService {
+class ProfileService {
   public users = userModel;
 
   public async findAllUser(): Promise<user[]> {
@@ -15,10 +15,8 @@ class UserService {
 
   public async findUserById(userId: string): Promise<user> {
     if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
-
     const findUser: user = await this.users.findOne({ _id: userId });
     if (!findUser) throw new HttpException(409, "You're not user");
-
     return findUser;
   }
 
@@ -61,4 +59,4 @@ class UserService {
   }
 }
 
-export default UserService;
+export default ProfileService;
