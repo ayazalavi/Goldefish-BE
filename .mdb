@@ -1,0 +1,11 @@
+{
+  "projectName": "goldefish",
+  "meta": {
+    "type": "backend"
+  },
+  "backend": {
+    "platform": "node12"
+  },
+  "hash": "5fc19b5a",
+  "packageManager": "npm"
+}
