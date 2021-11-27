@@ -1,0 +1,21 @@
+{
+    "env": "production",
+    "dbConfig": {
+        "host": "ayaz_alavi_goldefish:a$gCo%|4&2@mongo.db.mdbgo.com",
+        "database": "ayaz_alavi_goldefish",
+        "port": 8604
+    },
+    "email": {
+        "email":"goldefish.dev@gmail.com",
+        "password":"likmfqcmazmllmyz"
+    },
+    "secretKey": "secretKey",
+    "log": {
+        "format": "combined",
+        "dir": "../logs"
+    },
+    "cors": {
+        "origin": "127.0.0.1",
+        "credentials": true
+    }
+}
