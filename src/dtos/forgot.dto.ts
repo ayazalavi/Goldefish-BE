@@ -1,6 +1,7 @@
-import { IsEmail, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class ForgotDTO {
-  @IsEmail()
+  @IsString()
+  @IsNotEmpty()
   public email: string;
 }
