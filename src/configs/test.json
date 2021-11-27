@@ -1,7 +1,7 @@
 {
     "env": "testing",
     "dbConfig": {
-        "host": "165.227.211.255",
+        "host": "127.0.0.1",
         "database": "goldefish",
         "port": 27017
     },
@@ -9,13 +9,13 @@
         "email":"goldefish.dev@gmail.com",
         "password":"likmfqcmazmllmyz"
     },
-    "secretKey": "secretKey",
+    "secretKey": "00 22 44 66 88 99 77 55 33 11",
     "log": {
-        "format": "combined",
+        "format": "dev",
         "dir": "../logs"
     },
     "cors": {
-        "origin": "127.0.0.1",
+        "origin": true,
         "credentials": true
     }
 }
