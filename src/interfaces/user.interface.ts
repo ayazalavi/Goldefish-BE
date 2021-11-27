@@ -1,4 +1,4 @@
-import { Model, ObjectId } from "mongoose";
+import { Document, Model, ObjectId } from "mongoose";
 import { AccountTypes } from "./accounttypes.interface";
 import { review } from "./review.interface";
 
@@ -77,14 +77,14 @@ export interface settings {
 	blocked:[ObjectId],
 }
 
-export interface user {
-  _id: string;
+export interface user extends Document {
+  _id?: string;
   photo: string;
   background: string;
   name: name;
   username: string;
 	email: string;
-  password: string;
+  password?: string;
   accountType: AccountTypes;  
   location: location;
   dateOfBirth: dateOfBirth;
@@ -98,7 +98,7 @@ export interface user {
   settings: settings;
   socialMediaHandles: Map<string, string>;
   isEmailVerified: boolean;
-  verificationCode: string;
+  verificationCode?: string;
 }
 
 
