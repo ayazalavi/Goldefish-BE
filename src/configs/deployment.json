@@ -1,9 +1,9 @@
 {
     "env": "production",
     "dbConfig": {
-        "host": "ayaz_alavi_goldefish:a$gCo%|4&2@mongo.db.mdbgo.com",
-        "database": "ayaz_alavi_goldefish",
-        "port": 8604
+        "host": "165.227.211.255",
+        "database": "goldefish",
+        "port": 27017
     },
     "email": {
         "email":"goldefish.dev@gmail.com",

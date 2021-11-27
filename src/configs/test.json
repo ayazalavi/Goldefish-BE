@@ -1,17 +1,21 @@
 {
-    "env": "test",
+    "env": "testing",
     "dbConfig": {
-        "host": "localhost",
-        "database": "mongoose",
+        "host": "165.227.211.255",
+        "database": "goldefish",
         "port": 27017
+    },
+    "email": {
+        "email":"goldefish.dev@gmail.com",
+        "password":"likmfqcmazmllmyz"
     },
     "secretKey": "secretKey",
     "log": {
-        "format": "dev",
+        "format": "combined",
         "dir": "../logs"
     },
     "cors": {
-        "origin": true,
+        "origin": "127.0.0.1",
         "credentials": true
     }
 }
