@@ -2,7 +2,7 @@ import { AccountTypes } from '@/enum/accounttypes.enum';
 import { ProfileActions } from '@/enum/profileactions.enum';
 import { DateValidator } from '@/validators/date.validator';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsAlphanumeric, IsArray, IsBoolean, IsDate, IsDateString, IsEmail, isEnum, IsEnum, IsISO31661Alpha3, IsMongoId, isNotEmpty, IsNotEmpty, IsNotEmptyObject, IsString, Length, Matches, MaxLength, MinLength, Validate, ValidateIf, ValidateNested } from 'class-validator';
+import { ArrayMinSize, IsAlphanumeric, IsArray, IsBoolean, IsDate, IsDateString, IsEmail, isEnum, IsEnum, IsISO31661Alpha3, IsMongoId, isNotEmpty, IsNotEmpty, IsNotEmptyObject, IsString, IsUrl, Length, Matches, MaxLength, MinLength, Validate, ValidateIf, ValidateNested } from 'class-validator';
 import { ObjectId } from 'mongoose';
 
 
@@ -26,9 +26,10 @@ export class ProfileDTO {
     })
     public accountType: string;
 
-    @ValidateIf(o => o.action === ProfileActions.LOCATION || o.action === ProfileActions[1])
-    @IsNotEmpty()
-    @IsString()
+    @ValidateIf(o => o.action === ProfileActions.LOCATION || o.action === ProfileActions[1])    
+    @IsNotEmpty({
+        message:"Please provide city"
+    })
     public city: string;
 
     @ValidateIf(o => o.action === ProfileActions.LOCATION || o.action === ProfileActions[1])
@@ -40,93 +41,144 @@ export class ProfileDTO {
     public display: boolean;
 
     @ValidateIf(o => o.action === ProfileActions.BIRTHDAY || o.action === ProfileActions[2])
-    @Validate(DateValidator)
+    @Validate(DateValidator, {
+        message:"Please provide valid date of birth"
+    })
     public dateOfBirth: string;
 
     @ValidateIf(o => o.action === ProfileActions.BUSINESS_INTERESTS || o.action === ProfileActions[3])
     @IsArray()
     @IsMongoId({
-        each: true
+        each: true,
+        message: "Please provide valid business interests"
     })
-    @ArrayMinSize(1)
+    @ArrayMinSize(1, {
+        message:"Please provide atleast 1 valid interest"
+    })
     public talentInterests: [ObjectId];
 
     @ValidateIf(o => o.action === ProfileActions.TAGS || o.action === ProfileActions[4])
     @IsArray()
     @IsMongoId({
-        each: true
+        each: true,
+        message: "Please provide valid tags"
     })
-    @ArrayMinSize(1)
+    @ArrayMinSize(1, {
+        message:"Please provide atleast 1 tag"
+    })
     public tags: [ObjectId];
 
     @ValidateIf(o => o.action === ProfileActions.FRIEND || o.action === ProfileActions[5])  
-    @IsMongoId()
-    @IsNotEmpty()
+    @IsMongoId({
+        message: "Please provide valid friend id"
+    })
     public friend: ObjectId;
 
     @ValidateIf(o => o.action === ProfileActions.SUBSCRIPTION || o.action === ProfileActions[6])  
-    @IsMongoId()
-    @IsNotEmpty()
+    @IsMongoId({
+        message: "Please provide valid account id for subscribing to it"
+    })
     public subscription: ObjectId;
 
+    @ValidateIf(o => o.action === ProfileActions.IMAGES || o.action === ProfileActions[7])  
+    @IsUrl({}, {
+        message: "Please provide valid profile photo"
+    })
+    public profilePhoto: ObjectId;
+
+    @ValidateIf(o => o.action === ProfileActions.IMAGES || o.action === ProfileActions[7])  
+    @IsUrl({}, {
+        message: "Please provide valid background image"
+    })
+    public backgroundPhoto: ObjectId;
+
     @ValidateIf(o => o.action === ProfileActions.BUSINESS_INFO || o.action === ProfileActions[8])  
-    @IsAlphanumeric()
-    @IsString()
-    @Length(5, 50)
+    @Matches(/^[.@&]?[a-zA-Z0-9 ]+[ !.@&()]?[ a-zA-Z0-9!()]+/, {
+        message: "Please enter valid business name"
+    })
+    @MaxLength(50, {
+        message: "Business name should be less than 50 characters."
+    })
     public businessName: string;
 
     @ValidateIf(o => ProfileDTO.profileBioGroup.indexOf(o.action) !== -1)  
-    @IsString()
-    @Length(10, 170)
+    @Length(1, 170, {
+        message: "Please make sure bio contains less than 170 characters and is not empty"
+    })
+    @IsString({
+        message:"Please enter your bio"
+    })
     public profileBio: string;
 
     @ValidateIf(o => ProfileDTO.titleGroup.indexOf(o.action) !== -1)
-    @IsAlphanumeric()
-    @IsString()
-    @Length(2, 30)
+    @Matches(/^[.@&]?[a-zA-Z0-9 ]+[ !.@&()]?[ a-zA-Z0-9!()]+/, {
+        message: "Please enter valid title"
+    })
+    @MaxLength(50, {
+        message: "Title should be less than 50 characters."
+    })
     public title: string;
 
     @ValidateIf(o => o.action === ProfileActions.ADD_AWARD || o.action === ProfileActions[10])
-    @IsNotEmpty()
-    @IsString()
-    @Length(2, 50)
+    @IsString({
+        message:"Please provide valid location of the award"
+    })
+    @Length(2, 50, {
+        message:"Location should be between 2-50 characters in length"
+    })
     public location: string;
 
     @ValidateIf(o => o.action === ProfileActions.ADD_AWARD || o.action === ProfileActions[10])
-    @Validate(DateValidator)
-    @IsNotEmpty()
-    @IsString()
+    @Validate(DateValidator, {
+        message:"Please provide valid date"
+    })
     public date: string;
 
     @ValidateIf(o => o.action === ProfileActions.BUSINESS_DETAILS || o.action === ProfileActions[9])  
-    @IsAlphanumeric()
-    @IsString()
-    @Length(5, 50)
+    @IsString({
+        message:"Please provide type of the business"
+    })
+    @Length(5, 50, {
+        message:"Type of business should have less than 50 characters"
+    })
     public typeOfBusiness: string;
 
     @ValidateIf(o => ProfileDTO.descriptionGroup.indexOf(o.action) !== -1)  
-    @IsString()
-    @Length(10, 170)
+    @Length(1, 170, {
+        message: "Please make sure description contains less than 170 characters and is not empty"
+    })
+    @IsString({
+        message:"Please enter description"
+    })
     public description: string;
 
     @ValidateIf(o => ProfileDTO.categoryGroup.indexOf(o.action) !== -1)  
-    @IsMongoId()
+    @IsMongoId({
+        message: "Please provide valid category id"
+    })
     public category: ObjectId;
 
     @ValidateIf(o => o.action === ProfileActions.PERSONAL_INFO || o.action === ProfileActions[12])
-    @IsString()
-    @Length(5, 20)
+    @Matches(/^[.@&]?[a-zA-Z0-9 ]+[ !.@&()]?[ a-zA-Z0-9!()]+/, {
+        message: "Please provide your full name"
+    })
+    @Length(2, 50, {
+        message: "Only 2 to 50 characters allowed"
+    })
     fullname: string;
 
     @ValidateIf(o => o.action === ProfileActions.ADD_EXPERIENCE || o.action === ProfileActions[13])
-    @IsAlphanumeric()
-    @IsString()
-    @Length(2, 20)
+    @Matches(/^[.@&]?[a-zA-Z0-9 ]+[ !.@&()]?[ a-zA-Z0-9!()]+/, {
+        message: "Please provide your employer name"
+    })
+    @Length(2, 50, {
+        message: "Only 2 to 50 characters allowed"
+    })
     public employer: string;
 
     @ValidateIf(o => o.action === ProfileActions.ADD_EXPERIENCE || o.action === ProfileActions[13])
-    @Validate(DateValidator)
-    @IsNotEmpty()
-    @IsString()
+    @Validate(DateValidator, {
+        message:"Please provide your date of employment"
+    })
     public dateOfEmployment: string;
 }
