@@ -4,6 +4,8 @@ import { HttpException } from '@exceptions/HttpException';
 import { user } from '@/interfaces/user.interface';
 import userModel from '@/models/user.model';
 import { isEmpty } from '@utils/util';
+import { ProfileActions } from '@/enum/profileactions.enum';
+import _ from "lodash";
 
 class ProfileService {
   public users = userModel;
@@ -32,23 +34,68 @@ class ProfileService {
     return createUserData;
   }
 
-  public async updateUser(userId: string, userData: SignUpDTO): Promise<user> {
-    if (isEmpty(userData)) throw new HttpException(400, "You're not userData");
+  public async updateUser(user: user, data: any): Promise<user> {
+    let action: string = data.action;
+    const methodName = _.camelCase(`save ${typeof action === "number" ? ProfileActions[action] : action}`);
+    console.log(methodName);
+    this[methodName]();
+    return user.save()
+  }
 
-    if (userData.email) {
-      const findUser: user = await this.users.findOne({ email: userData.email });
-      if (findUser && findUser._id != userId) throw new HttpException(409, `You're email ${userData.email} already exists`);
-    }
+  private saveAccountType(user: user, data: any) {
+    console.log("save")
+  }
 
-    if (userData.password) {
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      userData = { ...userData, password: hashedPassword };
-    }
+  private saveLocation(user: user, data: any) {
+    console.log("save")
+  }
 
-    const updateUserById: user = await this.users.findByIdAndUpdate(userId, { userData });
-    if (!updateUserById) throw new HttpException(409, "You're not user");
+  private saveBirthday(user: user, data: any) {
+    console.log("save")
+  }
 
-    return updateUserById;
+  private saveBusinessInterests(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveTags(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveFriend(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveSubscription(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveImages(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveBusinessInfo(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveBusinessDetails(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveAddAward(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveAddTalent(user: user, data: any) {
+    console.log("save")
+  }
+
+  private savePersonalInfo(user: user, data: any) {
+    console.log("save")
+  }
+
+  private saveAddExperience(user: user, data: any) {
+    console.log("save")
   }
 
   public async deleteUser(userId: string): Promise<user> {
