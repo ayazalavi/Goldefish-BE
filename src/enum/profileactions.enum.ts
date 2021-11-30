@@ -6,7 +6,7 @@ export enum ProfileActions {
     TAGS,
     FRIEND,
     SUBSCRIPTION,
-    Images,
+    IMAGES,
     BUSINESS_INFO,
     BUSINESS_DETAILS,
     ADD_AWARD,
