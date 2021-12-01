@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import { award, businessItem, experience, seeking, settings, talent, talentItem, user, userModel } from "@/interfaces/user.interface";
 import { AccountTypes } from "@/enum/accounttypes.enum";
+import e from "express";
 
 const Award = new Schema<award>({
 	title: {type: String, required: true},
@@ -22,10 +23,10 @@ const BusinessItem = new Schema<businessItem>({
 });
 
 const Seeking = new Schema<seeking>({
-	businessDetails: [BusinessItem],
+	businessDetails: BusinessItem,
 	businessName: String,
 	profileBio: String,
-	awards: [Award],
+	awards:[Award],
 	talentInterests: [{type: Schema.Types.ObjectId, ref:"METADATA"}]
 });
 
@@ -37,8 +38,8 @@ const TalentItem = new Schema<talentItem>({
 
 const Talent = new Schema<talent>({
 	talents: [TalentItem],
-	fullname: {type: String, required: true},
-	profileBio : {type: String, required: true},	
+	fullname: {type: String, required: false},
+	profileBio : {type: String, required: false},	
 	experience: [Experience]
 });
 
@@ -91,7 +92,7 @@ const schema = new Schema<user, userModel>({
 	seekingTalent: {type: Seeking, required: false},
 	tags: [{ type: Schema.Types.ObjectId, ref:"METADATA"}],
 	friends: [{ type: Schema.Types.ObjectId, ref: "USER" }],
-	subscribtions: [{ type: Schema.Types.ObjectId, ref: "USER" }],
+	subscriptions: [{ type: Schema.Types.ObjectId, ref: "USER" }],
 	reviews: [{type:Schema.Types.ObjectId, ref:"REVIEW"}],
 	phone: { type: String, required: false, index: true },
 	settings: {type: Settings, required: false},

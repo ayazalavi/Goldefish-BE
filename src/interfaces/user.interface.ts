@@ -52,7 +52,7 @@ export interface award {
 }
 
 export interface seeking {
-  businessDetails: [businessItem],
+  businessDetails: businessItem,
   businessName: string;
   profileBio: string;
 	awards: [award],
@@ -92,7 +92,7 @@ export interface user extends Document {
   seekingTalent: seeking;
   tags: Array<ObjectId>;
   friends: Array<ObjectId>;
-  subscribtions: Array<ObjectId>;
+  subscriptions: Array<ObjectId>;
   reviews: Array<review>;
   phone: string;
   settings: settings;

@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
 import { SignUpDTO } from '@/dtos/signup.dto';
 import { HttpException } from '@exceptions/HttpException';
-import { user } from '@/interfaces/user.interface';
+import { businessItem, seeking, talent, user } from '@/interfaces/user.interface';
 import userModel from '@/models/user.model';
 import { isEmpty } from '@utils/util';
 import { ProfileActions } from '@/enum/profileactions.enum';
 import _ from "lodash";
+import { Schema } from 'mongoose';
 
 class ProfileService {
   public users = userModel;
@@ -37,73 +38,104 @@ class ProfileService {
   public async updateUser(user: user, data: any): Promise<user> {
     let action: string = data.action;
     const methodName = _.camelCase(`save ${typeof action === "number" ? ProfileActions[action] : action}`);
-    console.log(methodName);
-    this[methodName]();
+    console.log(methodName, data);
+    return this[methodName](user, data);    
+  }
+
+  public saveAccountType(user: user, data: any) {    
+    user.accountType = data.accountType;
     return user.save()
   }
 
-  private saveAccountType(user: user, data: any) {
-    console.log("save")
+  public saveLocation(user: user, data: any) {
+    user.location.city = data.city;
+    user.location.country = data.country;
+    user.location.displayOnProfile = data.display;
+    return user.save()
   }
 
-  private saveLocation(user: user, data: any) {
-    console.log("save")
+  public saveBirthday(user: user, data: any) {
+    user.dateOfBirth.date = new Date(data.dateOfBirth);
+    user.dateOfBirth.displayOnProfile = data.display;
+    return user.save();
   }
 
-  private saveBirthday(user: user, data: any) {
-    console.log("save")
+  public saveBusinessInterests(user: user, data: any) {    
+    if (!user.seekingTalent) user.seekingTalent = {} as seeking;
+    user.seekingTalent.talentInterests = data.talentInterests;
+    return user.save();
   }
 
-  private saveBusinessInterests(user: user, data: any) {
-    console.log("save")
+  public saveTags(user: user, data: any) {
+    user.tags = data.tags;
+    return user.save();
   }
 
-  private saveTags(user: user, data: any) {
-    console.log("save")
+  public saveFriend(user: user, data: any) {
+    if (user.friends.find((friend: Schema.Types.ObjectId) => friend.toString() === data.friend))
+      throw new HttpException(400, "Friend already added");
+    user.friends.push(data.friend);
+    return user.save();
   }
 
-  private saveFriend(user: user, data: any) {
-    console.log("save")
+  public saveSubscription(user: user, data: any) {
+    if (user.subscriptions.find((subs: Schema.Types.ObjectId) => subs.toString() === data.subscription))
+      throw new HttpException(400, "Subscription already made");
+    user.subscriptions.push(data.subscription);
+    return user.save();
   }
 
-  private saveSubscription(user: user, data: any) {
-    console.log("save")
+  public saveImages(user: user, data: any) {
+    user.photo = data.profilePhoto;
+    user.background = data.backgroundPhoto;
+    return user.save()
   }
 
-  private saveImages(user: user, data: any) {
-    console.log("save")
+  public saveBusinessInfo(user: user, data: any) {
+    if (!user.seekingTalent) user.seekingTalent = {} as seeking;
+    user.seekingTalent.businessName = data.businessName;
+    user.seekingTalent.profileBio = data.profileBio;
+    return user.save();
   }
 
-  private saveBusinessInfo(user: user, data: any) {
-    console.log("save")
+  public saveBusinessDetails(user: user, data: any) {
+    if (!user.seekingTalent) user.seekingTalent = {} as seeking;
+    if (!user.seekingTalent.businessDetails) user.seekingTalent.businessDetails = {} as businessItem;
+    user.seekingTalent.businessDetails.title = data.title;
+    user.seekingTalent.businessDetails.description = data.description;
+    user.seekingTalent.businessDetails.category = data.category;
+    user.seekingTalent.businessDetails.typeOfBusiness = data.typeOfBusiness;
+    return user.save();
   }
 
-  private saveBusinessDetails(user: user, data: any) {
-    console.log("save")
+  public saveAddAward(user: user, data: any) {
+    if (!user.seekingTalent) user.seekingTalent = {} as seeking;
+    else if (user.seekingTalent.awards.length >= 5) throw new HttpException(400, "Maximum limit reached")
+    user.seekingTalent.awards.push({title: data.title, location: data.location, date: data.date})
+    return user.save();
   }
 
-  private saveAddAward(user: user, data: any) {
-    console.log("save")
+  public saveAddTalent(user: user, data: any) {
+    if (!user.showcaseTalent) user.showcaseTalent = {} as talent;
+    else if (user.showcaseTalent.talents.length >= 5) throw new HttpException(400, "Maximum limit reached")
+    user.showcaseTalent.talents.push({title: data.title, description: data.description, category: data.category})
+    return user.save();
   }
 
-  private saveAddTalent(user: user, data: any) {
-    console.log("save")
+  public savePersonalInfo(user: user, data: any) {
+    if (!user.showcaseTalent) user.showcaseTalent = {} as talent;
+    user.showcaseTalent.fullname = data.fullname;
+    user.showcaseTalent.profileBio = data.profileBio;
+    return user.save();
   }
 
-  private savePersonalInfo(user: user, data: any) {
-    console.log("save")
+  public saveAddExperience(user: user, data: any) {
+    if (!user.showcaseTalent) user.showcaseTalent = {} as talent;
+    else if (user.showcaseTalent.experience.length >= 5) throw new HttpException(400, "Maximum limit reached")
+    user.showcaseTalent.experience.push({employer: data.employer, title: data.title, dateOfEmployment: data.dateOfEmployment})
+    return user.save();
   }
 
-  private saveAddExperience(user: user, data: any) {
-    console.log("save")
-  }
-
-  public async deleteUser(userId: string): Promise<user> {
-    const deleteUserById: user = await this.users.findByIdAndDelete(userId);
-    if (!deleteUserById) throw new HttpException(409, "You're not user");
-
-    return deleteUserById;
-  }
 }
 
 export default ProfileService;
