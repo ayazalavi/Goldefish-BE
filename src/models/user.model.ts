@@ -75,6 +75,10 @@ const schema = new Schema<user, userModel>({
 		required: true,
 		unique: true,
 	},
+	backgroundBio: {
+		type: String,
+		required: false,
+	},
 	password: { type: String, required: false },
 	isEmailVerified: { type: Boolean, default: false},
 	verificationCode: { type: String, required: true},
