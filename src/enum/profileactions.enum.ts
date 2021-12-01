@@ -13,5 +13,7 @@ export enum ProfileActions {
     ADD_TALENT,
     PERSONAL_INFO,
     ADD_EXPERIENCE,
-    EMAIL,
+    SETTINGS,
+    ACCOUNT_DETAILS,
+    PROFILE_UPDATE
 }
